@@ -108,7 +108,28 @@ end component ;
 	   pin8             : inout std_logic 
 	); 
     end component ; 
+
+
+	component UAPBCORE is
+    port (
 	
+	 PCLK     :IN STD_LOGIC;
+	 PRESETN  :IN STD_LOGIC;
+	 PSEL     :IN STD_LOGIC;
+	 PENABLE  :IN STD_LOGIC;
+	 PADDR    :in std_logic_vector(31 downto 0) ;
+	 PWRITE   :IN STD_LOGIC;
+	 PWDATA   :in std_logic_vector(7 downto 0) ;
+	 PRDATA   :out std_logic_vector(7 downto 0) ;
+	 PREADY   :out std_logic;
+	 RX       :IN STD_LOGIC;
+	 TX       :OUT STD_LOGIC;
+	DATAOUT   :out std_logic_vector(7 downto 0);
+	tick1     :out std_logic
+	
+	
+	 ) ;
+	end component ; 
 	
 	
 	COMPONENT mem_0
@@ -185,7 +206,7 @@ end component ;
     
     signal PSEL         : STD_LOGIC;
     signal i2c_wr0      : STD_LOGIC;
-    
+    signal uart_wr2     : STD_LOGIC;
     
     
    
@@ -193,6 +214,8 @@ end component ;
     
     signal i2c_cs0      : STD_LOGIC;
     signal gpio_cs1  	: STD_LOGIC; 
+    signal uart_cs2     : STD_LOGIC; 
+    signal uart_dout2   : std_logic_vector(7 downto 0);
 
     signal plic_cs  	: STD_LOGIC; 
     signal rom_cs  		: STD_LOGIC;
@@ -313,7 +336,29 @@ end component ;
        pin7                => st_pin7,
        pin8                => st_pin8          
          ) ;
-         
+
+
+u_uart_2: UAPBCORE
+	 port map (
+	
+      PCLK                  => clk_p ,             
+      PRESETN               => reset,                            
+      PSEL                  => uart_cs2,                            
+      PENABLE               => enb,         
+      PADDR                 => addrb(31 downto 0),
+                                         
+      PWRITE                => uart_wr2,     
+      PWDATA                => dinb(7 downto 0),              
+      PRDATA                => uart_dout2,
+      PREADY                => open,
+      RX                    => sin2,
+      TX                    => sout2,                  
+      DATAOUT               => uart_dout2,
+      tick1                 => TICK      
+         );
+
+
+	      
      -- NEW UART
      	
          
@@ -423,8 +468,9 @@ end component ;
 	
     i2c_cs0 	  <= '1' when addrb(31 downto 8)   = x"300007"  and enb = '1' else '0';                -- 10000100- 100001ff  --I2C0  
     gpio_cs1 	  <= '1' when addrb(31 downto 8)   = x"300008"  and enb = '1' else '0';                -- 30000800- 300008ff  --gpio1
-
-	
+    uart_cs2      <='1' when  addrb(31 downto 8)   =x"300009"  else '0';
+    uart_wr2      <= '1' when uart_cs2 = '1' else '0';
+						
 	dmem_cs 	  <= '1' when addrb(31 downto 16)  = x"0001"    and enb = '1' else '0';                -- 00010000-00017fff   --Boot Memory 
     plic_cs  	  <= '1' when addrb(31 downto 12)  = x"20010"	and enb = '1' else '0';  -- 20010000- 200100ff    --20010000-raw interrupt  , 20010008- interrupt enables  , 20010010- interrupt status   
     
