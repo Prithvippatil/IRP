@@ -14,7 +14,16 @@ architecture bench of SOC_top_tb is
       proc_beat			    : out std_logic; 
       
       scl                   : inout std_logic;
-      sda                   : inout std_logic
+      sda                   : inout std_logic;
+      
+   st_pin1                  : inout STD_LOGIC;
+   st_pin2                  : inout STD_LOGIC;
+   st_pin3                 : inout STD_LOGIC;
+   st_pin4                  : inout STD_LOGIC;
+   st_pin5                  : inout STD_LOGIC;
+   st_pin6                  : inout STD_LOGIC;
+   st_pin7                  : inout STD_LOGIC;
+   st_pin8                  : inout STD_LOGIC
       );
   end component;
   
