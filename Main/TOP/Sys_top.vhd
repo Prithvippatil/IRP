@@ -9,20 +9,18 @@ use ieee.std_logic_textio.all;
 entity Sys_top is
 	
 	port (
-	clk_st                 : in  std_logic;  
+	clk_p                 : in  std_logic;  
 	rst_in                : in  std_logic ; 
---    proc_beat			  : out std_logic; 
-   st_pin1                  : inout STD_LOGIC;
-   st_pin2                  : inout STD_LOGIC;
-   st_pin3                 : inout STD_LOGIC;
-   st_pin4                  : inout STD_LOGIC;
-   st_pin5                  : inout STD_LOGIC;
-   st_pin6                  : inout STD_LOGIC;
-   st_pin7                  : inout STD_LOGIC;
-   st_pin8                  : inout STD_LOGIC
+    proc_beat			  : out std_logic; 
+    
+    scl                   : inout std_logic;
+    sda                   : inout std_logic
     );
   
-end Sys_top ;                                                               
+end Sys_top ;       
+   
+
+                                                        
 
 architecture Sys_top_a of Sys_top is  
 
@@ -58,57 +56,30 @@ architecture Sys_top_a of Sys_top is
 	  ext_interrupt		  : in std_logic
 	  
          ) ;   
-	end component ;  
+	end component ; 
 	
---	component uart_top is
---    port (
---      clk                 : in std_logic ;
---      mr                  : in std_logic ;   
---      cs                  : in std_logic ;
---      a                   : in std_logic_vector(2 downto 0) ;
---      rd                  : in std_logic ;
---      wr                  : in std_logic ;
---      sin                 : in std_logic ;
---      din                 : in std_logic_vector(7 downto 0) ;
-                          
---      dout                : out std_logic_vector(7 downto 0) ;
---      sout                : out std_logic ;
---      ddis                : out std_logic ;
---      intr                : out std_logic ;
---      baudout_n           : out std_logic ;
---      rxrdy_n             : out std_logic ;
---      txrdy_n             : out std_logic 
-       
---         ) ;
---	end component ; 
-	 component clk_divider is
-	 port(
-	 clock_in            : in std_logic;
-	 clock_out            : out std_logic
-	 );
-	 end component;
-
-	 component gpio_chip is
+	
+	component apb_i2c_ic is
 	port (
 	   PCLK              : in std_logic ;
 	   PRESETn           : in std_logic ; 
 	   PSEL              : in std_logic ;
 	   PENABLE           : in std_logic ; 
 	   PWrite            : in std_logic ; 
-	   PADDR             : in std_logic_vector(7 downto 0) ; 
-	   PWDATA            : in std_logic_vector(7 downto 0) ;
-
-	   PRDATA            : out std_logic_vector(7 downto 0);     
-	   pin1              : inout std_logic ;
-	   pin2              : inout std_logic ;
-	   pin3              : inout std_logic ;
-	   pin4              : inout std_logic ;
-	   pin5              : inout std_logic ;
-	   pin6              : inout std_logic ;
-	   pin7              : inout std_logic ;
-	   pin8             : inout std_logic 
+	   PADDR             : in std_logic_vector(31 downto 0) ; 
+	   PWDATA            : in std_logic_vector(31 downto 0) ;
+	   
+	   PRDATA            : out std_logic_vector(31 downto 0) ;
+	   PREADY            : out std_logic;
+	   PSLVERR           : out std_logic ;
+	   
+	   i2c_sda           : inout std_logic ;
+	   i2c_scl           : inout std_logic       
+	
 	); 
-    end component ; 
+end component ; 
+	
+	
 	
 	COMPONENT mem_0
   	PORT (
@@ -148,8 +119,10 @@ architecture Sys_top_a of Sys_top is
 	end COMPONENT;
 	
 	
-
-    signal clk_p        : std_logic;
+    
+    -- new signals
+        
+    
 	signal dmem_size	: std_logic_vector(2 downto 0);
 	signal web_rw 		: STD_LOGIC;
     signal addra 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -158,30 +131,48 @@ architecture Sys_top_a of Sys_top is
         
     signal web 			: STD_LOGIC_VECTOR(15 DOWNTO 0);
     signal addrb 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
+    signal addrb1 		: STD_LOGIC_VECTOR(31 DOWNTO 0);    
+    signal addrb2 		: STD_LOGIC_VECTOR(31 DOWNTO 0);    
+
+    
     signal dinb 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
     signal doutb 		: STD_LOGIC_VECTOR(31 DOWNTO 0); 
-    
-    signal gpio_dout 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
     
     signal din_mux 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
     
     signal data_out		: STD_LOGIC_VECTOR(31 DOWNTO 0);
     
---    signal uart_dout0   : std_logic_vector(7 downto 0) ;      
+    signal uart_dout0   : std_logic_vector(7 downto 0) ;      
+    signal uart_dout1   : std_logic_vector(7 downto 0) ;      
+    signal uart_dout2   : std_logic_vector(7 downto 0) ;      
+
+
+    signal i2c_dout   : std_logic_vector(31 downto 0) ;      
+
   
---    signal uart_rd0  	: STD_LOGIC; 
---    signal uart_wr0  	: STD_LOGIC;
+  
     
+    signal PSEL         : STD_LOGIC;
+    signal i2c_wr0      : STD_LOGIC;
+    
+    
+    
+   
     signal dmem_cs  	: STD_LOGIC;                                   
---    signal uart_cs0  	: STD_LOGIC; 
-    signal gpio_cs1  	: STD_LOGIC; 
+    
+    signal i2c_cs0      : STD_LOGIC;
+    
     signal plic_cs  	: STD_LOGIC; 
     signal rom_cs  		: STD_LOGIC;
     signal pm_mem_cs    : STD_LOGIC;     
         
     signal clk_n        : STD_LOGIC; 
     signal wait_n       : STD_LOGIC; 
---    signal uart_intr0   : STD_LOGIC; 
+    signal uart_intr0   : STD_LOGIC; 
+    
+     
+    
+
     signal mtime_intr   : STD_LOGIC;  
     
     signal ena  		: STD_LOGIC;
@@ -251,55 +242,50 @@ architecture Sys_top_a of Sys_top is
       );   
       clk_n <= not(clk_p);
       wait_n <= '1';
-      
-      
---	u_uart_0: uart_top port map (
 	
---      clk                 => clk_n,             
---      mr                  => reset,                            
---      cs                  => uart_cs0,                            
---      a                   => addrb(4 downto 2),          
---      rd                  => uart_rd0,           
---      wr                  => uart_wr0,           
---      sin                 => sin0,               
---      din                 => dinb(7 downto 0),
-
---      dout                => uart_dout0,             
---      sout                => sout0,        
---      ddis                => open,        
---      intr                => uart_intr0,   
---      baudout_n           => open,        
---      rxrdy_n             => open,        
---      txrdy_n             => open         
---         ) ;
-      
-      gpio_top: gpio_chip port map (
+         
+    -- I2C port mapping
+	i2c_top: apb_i2c_ic port map (
 	
       PCLK                 => clk_p,             
       PRESETn              => reset,                            
-      PSEL                 => gpio_cs1,                            
-      PADDR                => addrb(7 downto 0),          
+      PSEL                 => i2c_cs0,                            
+      PADDR                => addrb(31 downto 0),          
       PWrite               => web_rw,                                   
-      PWDATA               => dinb(7 downto 0),
-      PRDATA               => gpio_dout(7 downto 0), 
-      PENABLE              => enb, 
-       pin1                => st_pin1,
-       pin2                => st_pin2,
-       pin3                => st_pin3,
-       pin4                => st_pin4, 
-       pin5                => st_pin5,
-       pin6                => st_pin6,
-       pin7                => st_pin7,
-       pin8                => st_pin8          
+      PWDATA               => dinb,
+
+      PRDATA               => i2c_dout, 
+      PENABLE              => enb  ,
+      PREADY               => open,
+      PSLVERR              => open,
+      i2c_scl              => scl,
+      i2c_sda              => sda                  
          ) ;
+            
+    
          
+     -- NEW UART
+     	
          
-      clock_top : clk_divider 
-      port map (
-	   clock_in => clk_st,
-	   clock_out => clk_p
-               
-         ) ;
+--     	u_uart_2: uart_top port map (
+	
+--      clk                 => clk_n,             
+--      mr                  => reset,                            
+--      cs                  => uart_cs2,                            
+--      a                   => addrb(4 downto 2),          
+--      rd                  => uart_rd2,           
+--      wr                  => uart_wr2,           
+--      sin                 => sin2,               
+--      din                 => dinb(7 downto 0),
+
+--      dout                => uart_dout2,             
+--      sout                => sout2,        
+--      ddis                => open,        
+--      intr                => uart_intr2,   
+--      baudout_n           => open,        
+--      rxrdy_n             => open,        
+--      txrdy_n             => open         
+--         ) ;  
          
  	boot_mem : mem_0                                                                             
                                                                            
@@ -334,9 +320,10 @@ architecture Sys_top_a of Sys_top is
 	    dinb              => data_out,                 
 	    doutb             => pm_doutb                  
 	  );
-	       
+	         
 	 rom_cs <= '1' when ( (addra(31 downto 16)= "0000000000000001" ) and (ena='1')) else '0';	     
-
+      
+     proc_beat <= scl;  
 	 dinb      <= data_out ;     
 	 inst_data <= pm_douta 				when addra(31 downto 18)= "00000000001000" else   --00200000-0023ffff  --256KB program memory	             
                                         douta;	
@@ -364,7 +351,6 @@ architecture Sys_top_a of Sys_top is
      	    	reset_signal <= '0';  
      	    	
      	    	reset        <= reset_signal;
-     	    	
      	                 	         
      	    end if;
      	    
@@ -372,24 +358,26 @@ architecture Sys_top_a of Sys_top is
     end process;    
 		
 	reset_n <= not reset; 
-	  
+	
 	din_mux 	<=  pm_doutb 										  when (pm_mem_cs = '1') else  				   
---					uart_dout0 & uart_dout0 & uart_dout0 & uart_dout0 when (uart_rd0  = '1') else 
+					
+					i2c_dout when (i2c_cs0  = '1') else 
+
+
 					prdata_plic                                       when (plic_cs   = '1') else
-					gpio_dout                                         when (gpio_cs1   = '1') else
 				    doutb 											  when (dmem_cs   =  '1') else ("00000000000000000000000000000000");
 				    
 	pm_mem_cs     <= '1' when ((addrb(31 downto 18)  = "00000000001000") and (enb = '1')) else '0';    -- 00200000-0023ffff   --program memory              
---	uart_cs0 	  <= '1' when addrb(31 downto 8)   = x"100001"  and enb = '1' else '0';                -- 10000100- 100001ff  --UART0 
-	gpio_cs1 	  <= '1' when addrb(31 downto 8)   = x"300008"  and enb = '1' else '0';                -- 30000800- 300008ff  --gpio1
---		check(0)  <= '1' when addrb(31 downto 8)   = x"300008"  and enb = '1' else '0';                -- 30000800- 300008ff  --gpio1
---	check(3) 	  <= '1' when addrb(31 downto 16)  = x"0001"    and enb = '1' else '0';                -- 00010000-00017fff   --Boot Memory 
-
+	
+    i2c_cs0 	  <= '1' when addrb(31 downto 8)   = x"300007"  and enb = '1' else '0';                -- 10000100- 100001ff  --UART0  
+ 
+	
 	dmem_cs 	  <= '1' when addrb(31 downto 16)  = x"0001"    and enb = '1' else '0';                -- 00010000-00017fff   --Boot Memory 
     plic_cs  	  <= '1' when addrb(31 downto 12)  = x"20010"	and enb = '1' else '0';  -- 20010000- 200100ff    --20010000-raw interrupt  , 20010008- interrupt enables  , 20010010- interrupt status   
     
---    uart_rd0 <= '1' when uart_cs0 = '1' and web_rw ='0' else '0'; 
---	uart_wr0 <= '1' when uart_cs0 = '1' and web_rw ='1' else '0'; 
+   
+	
+	
     
    
 	int_controller: process(clk_n,reset)
@@ -406,6 +394,7 @@ architecture Sys_top_a of Sys_top is
 			mtimecmp_ext	<=x"ffffffffffffffff";
 			mtime_count 	<=x"000";
 			mtime_intr		<='0';
+     	
      	else
      	      if clk_n'event and clk_n = '1' then    
      	      	
@@ -425,12 +414,10 @@ architecture Sys_top_a of Sys_top is
      	      	if plic_cs ='1' and enb='1' and web_rw='1' and 	addrb  = x"20010008" then  
      	      		
      	      		enable_interrupt <= data_out;  
-     	      	   
      	      	
      	      	elsif plic_cs ='1' and enb='1' and web_rw='1' and 	addrb  = x"20010580" then  
      	      		
      	      		mtime_ext(31 downto 0) <= data_out; 
-     	      		
      	      			
      	      	elsif plic_cs ='1' and enb='1' and web_rw='1' and 	addrb  = x"20010584" then  
      	      		
@@ -479,10 +466,10 @@ architecture Sys_top_a of Sys_top is
      	      	end if;		                                                                               
      	      	                                                                                           
               end if;                                                                                      
-       	end if; 
+       	end if;                                                                                            
     end process;                                                                                           
 	                                                                                                       
---	raw_interrupt <=	"0000000000000000000000000000000"& uart_intr0;                                                 
+	raw_interrupt <=	"0000000000000000000000000000000"& uart_intr0;                                                 
 	                                                                                                        
     ext_intr <= '0' when status_interrupt = x"00000000" else '1';  
                        
