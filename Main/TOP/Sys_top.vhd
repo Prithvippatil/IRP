@@ -14,7 +14,15 @@ entity Sys_top is
     proc_beat			  : out std_logic; 
     
     scl                   : inout std_logic;
-    sda                   : inout std_logic
+    sda                   : inout std_logic;
+   st_pin1                  : inout STD_LOGIC;
+   st_pin2                  : inout STD_LOGIC;
+   st_pin3                 : inout STD_LOGIC;
+   st_pin4                  : inout STD_LOGIC;
+   st_pin5                  : inout STD_LOGIC;
+   st_pin6                  : inout STD_LOGIC;
+   st_pin7                  : inout STD_LOGIC;
+   st_pin8                  : inout STD_LOGIC		
     );
   
 end Sys_top ;       
@@ -78,6 +86,28 @@ architecture Sys_top_a of Sys_top is
 	
 	); 
 end component ; 
+	
+	component gpio_chip is
+	port (
+	   PCLK              : in std_logic ;
+	   PRESETn           : in std_logic ; 
+	   PSEL              : in std_logic ;
+	   PENABLE           : in std_logic ; 
+	   PWrite            : in std_logic ; 
+	   PADDR             : in std_logic_vector(7 downto 0) ; 
+	   PWDATA            : in std_logic_vector(7 downto 0) ;
+
+	   PRDATA            : out std_logic_vector(7 downto 0);     
+	   pin1              : inout std_logic ;
+	   pin2              : inout std_logic ;
+	   pin3              : inout std_logic ;
+	   pin4              : inout std_logic ;
+	   pin5              : inout std_logic ;
+	   pin6              : inout std_logic ;
+	   pin7              : inout std_logic ;
+	   pin8             : inout std_logic 
+	); 
+    end component ; 
 	
 	
 	
@@ -148,6 +178,7 @@ end component ;
 
 
     signal i2c_dout   : std_logic_vector(31 downto 0) ;      
+    signal gpio_dout 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
 
   
   
@@ -161,7 +192,8 @@ end component ;
     signal dmem_cs  	: STD_LOGIC;                                   
     
     signal i2c_cs0      : STD_LOGIC;
-    
+    signal gpio_cs1  	: STD_LOGIC; 
+
     signal plic_cs  	: STD_LOGIC; 
     signal rom_cs  		: STD_LOGIC;
     signal pm_mem_cs    : STD_LOGIC;     
@@ -262,7 +294,25 @@ end component ;
       i2c_sda              => sda                  
          ) ;
             
-    
+      gpio_top: gpio_chip port map (
+	
+      PCLK                 => clk_p,             
+      PRESETn              => reset,                            
+      PSEL                 => gpio_cs1,                            
+      PADDR                => addrb(7 downto 0),          
+      PWrite               => web_rw,                                   
+      PWDATA               => dinb(7 downto 0),
+      PRDATA               => gpio_dout(7 downto 0), 
+      PENABLE              => enb, 
+       pin1                => st_pin1,
+       pin2                => st_pin2,
+       pin3                => st_pin3,
+       pin4                => st_pin4, 
+       pin5                => st_pin5,
+       pin6                => st_pin6,
+       pin7                => st_pin7,
+       pin8                => st_pin8          
+         ) ;
          
      -- NEW UART
      	
@@ -362,6 +412,8 @@ end component ;
 	din_mux 	<=  pm_doutb 										  when (pm_mem_cs = '1') else  				   
 					
 					i2c_dout when (i2c_cs0  = '1') else 
+					gpio_dout when (gpio_cs1   = '1') else
+	
 
 
 					prdata_plic                                       when (plic_cs   = '1') else
@@ -369,8 +421,9 @@ end component ;
 				    
 	pm_mem_cs     <= '1' when ((addrb(31 downto 18)  = "00000000001000") and (enb = '1')) else '0';    -- 00200000-0023ffff   --program memory              
 	
-    i2c_cs0 	  <= '1' when addrb(31 downto 8)   = x"300007"  and enb = '1' else '0';                -- 10000100- 100001ff  --UART0  
- 
+    i2c_cs0 	  <= '1' when addrb(31 downto 8)   = x"300007"  and enb = '1' else '0';                -- 10000100- 100001ff  --I2C0  
+    gpio_cs1 	  <= '1' when addrb(31 downto 8)   = x"300008"  and enb = '1' else '0';                -- 30000800- 300008ff  --gpio1
+
 	
 	dmem_cs 	  <= '1' when addrb(31 downto 16)  = x"0001"    and enb = '1' else '0';                -- 00010000-00017fff   --Boot Memory 
     plic_cs  	  <= '1' when addrb(31 downto 12)  = x"20010"	and enb = '1' else '0';  -- 20010000- 200100ff    --20010000-raw interrupt  , 20010008- interrupt enables  , 20010010- interrupt status   
