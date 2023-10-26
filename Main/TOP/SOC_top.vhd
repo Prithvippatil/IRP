@@ -34,7 +34,17 @@ entity SOC_top is
     proc_beat			  : out std_logic; 
     locked                : out std_logic;
     scl                   : inout std_logic;
-    sda                   : inout std_logic);
+    sda                   : inout std_logic; 
+   st_pin1                  : inout STD_LOGIC;
+   st_pin2                  : inout STD_LOGIC;
+   st_pin3                 : inout STD_LOGIC;
+   st_pin4                  : inout STD_LOGIC;
+   st_pin5                  : inout STD_LOGIC;
+   st_pin6                  : inout STD_LOGIC;
+   st_pin7                  : inout STD_LOGIC;
+   st_pin8                  : inout STD_LOGIC
+
+  );
 end Soc_top;
 
 architecture Behavioral of Soc_top is
@@ -46,7 +56,17 @@ architecture Behavioral of Soc_top is
       proc_beat			    : out std_logic; 
       
       scl                   : inout std_logic;
-      sda                   : inout std_logic
+      sda                   : inout std_logic; 
+      
+   st_pin1                  : inout STD_LOGIC;
+   st_pin2                  : inout STD_LOGIC;
+   st_pin3                 : inout STD_LOGIC;
+   st_pin4                  : inout STD_LOGIC;
+   st_pin5                  : inout STD_LOGIC;
+   st_pin6                  : inout STD_LOGIC;
+   st_pin7                  : inout STD_LOGIC;
+   st_pin8                  : inout STD_LOGIC
+
       );
   end component;
   
@@ -73,7 +93,17 @@ begin
                           rst_in    => rst_in,
                           proc_beat => proc_beat,
                           scl       => scl,
-                          sda       => sda
+                          sda       => sda,
+                          st_pin1    =>   st_pin1,         
+                          st_pin2    =>   st_pin2,
+                          st_pin3    =>   st_pin3,         
+                          st_pin4    =>   st_pin4,
+                          st_pin5    =>   st_pin5,         
+                          st_pin6    =>   st_pin6,
+                          st_pin7    =>   st_pin7,         
+                          st_pin8    =>   st_pin8
+
+
                         );
 
 clock_divider : clk_wiz_0
