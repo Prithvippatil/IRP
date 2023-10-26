@@ -45,7 +45,16 @@ begin
                           proc_beat => proc_beat,
                           
                           scl       => scl,
-                          sda       => sda
+                          sda       => sda,
+                         
+                          st_pin1    =>   st_pin1,         
+                          st_pin2    =>   st_pin2,
+                          st_pin3    =>   st_pin3,         
+                          st_pin4    =>   st_pin4,
+                          st_pin5    =>   st_pin5,         
+                          st_pin6    =>   st_pin6,
+                          st_pin7    =>   st_pin7,         
+                          st_pin8    =>   st_pin8
                         );
                         
 
