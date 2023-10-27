@@ -109,6 +109,23 @@ end component ;
 	); 
     end component ; 
 
+	component spi_top is
+	 port(
+	 PCLK                    :in std_logic;
+	 PRESETn                 : in std_logic ;
+	 PSEL                  : in std_logic ;
+     	 PENABLE                  : in std_logic ;   
+     	 PWrite                  : in std_logic ;
+      	 PADDR                   : in std_logic_vector(31 downto 0) ;      
+      	 PWDATA                : in std_logic_vector(31 downto 0) ;  
+      	 miso                 : in std_logic ;
+      	 PRDATA                : out std_logic_vector(31 downto 0) ;
+      	 --PREADY              : out std_logic ;
+      	 ss                 : out std_logic ;
+      	 sclk               : out std_logic ;
+      	 mosi               : out std_logic 
+	 );
+	 end component;
 
 	component UAPBCORE is
     port (
