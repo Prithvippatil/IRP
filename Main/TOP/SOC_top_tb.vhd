@@ -15,6 +15,11 @@ architecture bench of SOC_top_tb is
       
       scl                   : inout std_logic;
       sda                   : inout std_logic;
+
+      sclk                  : out std_logic;
+      miso                  : in std_logic;
+      mosi                  : out std_logic;
+      ss                    : out std_logic
       
    st_pin1                  : inout STD_LOGIC;
    st_pin2                  : inout STD_LOGIC;
@@ -37,6 +42,11 @@ architecture bench of SOC_top_tb is
   signal scl      : std_logic ;
   signal sda      : std_logic;
 
+  signal ss        : std_logic;
+  signal sclk      : std_logic;
+  signal  miso     : std_logic;
+  signal mosi      : std_logic;
+
 
 begin
 
@@ -46,6 +56,11 @@ begin
                           
                           scl       => scl,
                           sda       => sda,
+
+                          ss        => ss,
+                          sclk      => sclk,         
+                          miso      => miso ,       
+                          mosi      => mosi,
                          
                           st_pin1    =>   st_pin1,         
                           st_pin2    =>   st_pin2,
