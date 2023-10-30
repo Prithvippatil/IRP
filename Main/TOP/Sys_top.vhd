@@ -13,8 +13,8 @@ entity Sys_top is
 	rst_in                : in  std_logic ; 
     proc_beat			  : out std_logic; 
     
-    scl                   : inout std_logic;
-    sda                   : inout std_logic;
+    scl                   : inout std_logic;  -- i2c scl line
+    sda                   : inout std_logic;  -- i2c sda line
 
    sclk                    : out std_logic;
    miso                    : in std_logic;
@@ -28,7 +28,11 @@ entity Sys_top is
    st_pin5                  : inout STD_LOGIC;
    st_pin6                  : inout STD_LOGIC;
    st_pin7                  : inout STD_LOGIC;
-   st_pin8                  : inout STD_LOGIC		
+   st_pin8                  : inout STD_LOGIC;
+   
+   TX                       : out   STD_LOGIC;
+   RX                       : in    std_logic;
+   TICK                     : out   std_logic   	
     );
   
 end Sys_top ;       
@@ -218,7 +222,7 @@ end component ;
     
     signal uart_dout0   : std_logic_vector(7 downto 0) ;      
     signal uart_dout1   : std_logic_vector(7 downto 0) ;      
-    signal uart_dout2   : std_logic_vector(7 downto 0) ;      
+   -- signal uart_dout2   : std_logic_vector(7 downto 0) ;      
 
 
     signal i2c_dout   : std_logic_vector(31 downto 0) ;      
@@ -393,8 +397,8 @@ u_uart_2: UAPBCORE
       PWDATA                => dinb(7 downto 0),              
       PRDATA                => uart_dout2,
       PREADY                => open,
-      RX                    => sin2,
-      TX                    => sout2,                  
+      RX                    => RX,
+      TX                    => TX,                  
       DATAOUT               => uart_dout2,
       tick1                 => TICK      
          );
