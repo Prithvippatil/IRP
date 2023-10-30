@@ -238,6 +238,7 @@ end component ;
     
     signal i2c_cs0      : STD_LOGIC;
     signal gpio_cs1  	: STD_LOGIC; 
+    signal spi_cs       : STD_LOGIC;
     signal uart_cs2     : STD_LOGIC; 
     signal uart_dout2   : std_logic_vector(7 downto 0);
 
