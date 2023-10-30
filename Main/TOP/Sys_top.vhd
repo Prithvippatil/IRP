@@ -500,7 +500,7 @@ u_uart_2: UAPBCORE
 					
 					i2c_dout when (i2c_cs0  = '1') else 
 					gpio_dout when (gpio_cs1   = '1') else
-	
+					spi_dout  when (spi_cs   = '1') else
 
 
 					prdata_plic                                       when (plic_cs   = '1') else
