@@ -15,6 +15,12 @@ entity Sys_top is
     
     scl                   : inout std_logic;
     sda                   : inout std_logic;
+
+   sclk                    : out std_logic;
+   miso                    : in std_logic;
+   mosi                    : out std_logic;
+   ss                      : out std_logic;
+		
    st_pin1                  : inout STD_LOGIC;
    st_pin2                  : inout STD_LOGIC;
    st_pin3                 : inout STD_LOGIC;
