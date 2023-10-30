@@ -510,6 +510,7 @@ u_uart_2: UAPBCORE
 	
     i2c_cs0 	  <= '1' when addrb(31 downto 8)   = x"300007"  and enb = '1' else '0';                -- 10000100- 100001ff  --I2C0  
     gpio_cs1 	  <= '1' when addrb(31 downto 8)   = x"300008"  and enb = '1' else '0';                -- 30000800- 300008ff  --gpio1
+    spi_cs        <= '1' when addrb(31 downto 8)   = x"300006"  and enb = '1' else '0'; 
     uart_cs2      <='1' when  addrb(31 downto 8)   =x"300009"  else '0';
     uart_wr2      <= '1' when uart_cs2 = '1' else '0';
 						
