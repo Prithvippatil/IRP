@@ -46,8 +46,15 @@ architecture bench of SOC_top_tb is
   signal sclk      : std_logic;
   signal  miso     : std_logic;
   signal mosi      : std_logic;
-
-
+signal st_pin1                  :  STD_LOGIC;
+  signal st_pin2                  :  STD_LOGIC;
+ signal st_pin3                 :  STD_LOGIC;
+  signal st_pin4                  :  STD_LOGIC;
+ signal st_pin5                  :  STD_LOGIC;
+signal st_pin6                  :  STD_LOGIC;
+  signal st_pin7                  :  STD_LOGIC;
+  signal st_pin8                  :  STD_LOGIC;
+      
 begin
 
   uut: SOC_top port map ( clk_in     => clk_in,
