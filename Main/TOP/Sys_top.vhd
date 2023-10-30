@@ -360,6 +360,23 @@ end component ;
        pin8                => st_pin8          
          ) ;
 
+u_spi : spi_top port map ( 
+         
+           PRESETn    => reset,    
+           PCLK       => clk_p,
+           PENABLE    => enb,
+           PSEL       => spi_cs,    
+           PADDR      => addrb(31 downto 0),    
+           PWrite     => web_rw,   
+           PWDATA     => dinb,    
+           miso       => miso,    
+       
+           PRDATA     => spi_dout,    
+        --   PREADY     => open,
+            ss        => ss,             
+           sclk       => sclk,   
+           mosi       =>  mosi   
+         );
 
 u_uart_2: UAPBCORE
 	 port map (
