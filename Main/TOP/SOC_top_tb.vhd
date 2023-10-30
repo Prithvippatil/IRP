@@ -19,7 +19,7 @@ architecture bench of SOC_top_tb is
       sclk                  : out std_logic;
       miso                  : in std_logic;
       mosi                  : out std_logic;
-      ss                    : out std_logic
+      ss                    : out std_logic;
       
    st_pin1                  : inout STD_LOGIC;
    st_pin2                  : inout STD_LOGIC;
