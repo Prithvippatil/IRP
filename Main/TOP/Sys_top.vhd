@@ -222,7 +222,8 @@ end component ;
 
 
     signal i2c_dout   : std_logic_vector(31 downto 0) ;      
-    signal gpio_dout 		: STD_LOGIC_VECTOR(31 DOWNTO 0);
+    signal gpio_dout  : STD_LOGIC_VECTOR(31 DOWNTO 0) ;
+    signal spi_dout   : std_logic_vector(31 downto 0) ;
 
   
   
